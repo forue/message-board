@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="iweb212.bbs.dao.RespondDao">
+	<resultMap type="respond" id="respondResult">
+		<id property="id" column="id" />
+		<result property="context" column="context"/>
+		<result property="publishTime" column="published_time"/>
+		<!-- 一对一关联 -->
+		<association property="message" column="id"
+			select="selectMessages" />
+		<association property="admin" column="id"
+					select="selectAdmin" />
+	</resultMap>
+
+	<select id="selectMessages" resultMap="iweb212.bbs.dao.MessageDao.messagesResult">
+		select id, context,user_id,published_time 
+		from messages where id = #{id}
+	</select>
+	<select id="selectAdmin" resultMap="iweb212.bbs.dao.AdminDao.adminResult">
+		select id, name, password from admin where id==#{id}
+	</select>
+
+	<select id="findAll" resultMap="respondResult">
+		select id,context,admin_id,published_time from respond
+	</select>
+	<select id="findById" parameterType="int" resultMap="respondResult">
+		select id,context,admin_id,publish_time from respond where message_id = #{id}
+	</select>
+	<insert id="add" parameterType="respond">
+		insert into respond (context, admin_id, message_id, published_time) 
+			values (#{context}, 1, #{message.id}, #{publishTime})
+	</insert>
+	<update id="modify" parameterType="respond">
+		update respond set context = #{context}
+		where id = #{id}
+	</update>
+	<delete id="delete" parameterType="int">
+		delete from respond where id = #{id}
+	</delete>
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="iweb212.bbs.dao.AdminDao">
+	<resultMap type="admin" id="adminResult">
+		<id property="id" column="id" />
+		<result property="name" column="name"/>
+		<result property="password" column="password"/>
+		<!-- 处理一对多关联 -->
+		<association property="responds" column="id"
+			select="selectRespond" />
+	</resultMap>
+
+	<select id="selectRespond" resultType="respond">
+		select id,context,admin_id,published_time from respond where id = #{id}
+	</select>
+	
+	<select id="findAdmin" parameterType="admin" resultMap="adminResult">
+		select id, name
+		from admin where name = #{name} and password = #{password}
+	</select>
+
+</mapper>

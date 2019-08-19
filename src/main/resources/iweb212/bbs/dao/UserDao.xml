@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="iweb212.bbs.dao.UserDao">
+	<resultMap type="user" id="userResult">
+		<id property="id" column="id" />
+		<result property="username" column="username"/>
+		<result property="password" column="password"/>
+		<result property="sex" column="sex"/>
+		<result property="dispalyName" column="display_name"/>
+		<result property="registeredTime" column="registered_time"/>
+		<!-- 处理一对多关联 -->
+		<collection property="messages" column="id"
+			select="selectMessages" />
+	</resultMap>
+
+	<select id="selectMessages" resultMap="iweb212.bbs.dao.MessageDao.messagesResult">
+		select id, context,user_id,published_time
+		from messages where id = #{id}
+	</select>
+	
+	<select id="findUser" parameterType="user" resultMap="userResult">
+		select id,username,sex,display_name,registered_time from users where username = #{username} and password = #{password}
+	</select>
+	<select id="findUserById" parameterType="int" resultMap="userResult">
+		select id,username,sex,display_name,registered_time from users where id = #{id}
+	</select>
+	<insert id="addUser" parameterType="user">
+		insert into users(username, password, sex, display_name,registered_time)
+		values (#{username}, #{password}, #{sex},
+				#{dispalyName}, #{registeredTime})
+	</insert>
+</mapper>

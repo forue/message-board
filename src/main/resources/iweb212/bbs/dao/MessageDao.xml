@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="iweb212.bbs.dao.MessageDao">
+	<resultMap type="messages" id="messagesResult">
+		<id property="id" column="id" />
+		<result property="context" column="context"/>
+		<result property="publishedTime" column="published_time"/>
+		<!-- 处理一对一关联 -->
+		<association property="respond" column="id"
+			select="selectRespond" />
+		<!-- 处理一对一关联 -->
+		<association property="user" column="user_id"
+					 select="selectUsers" />
+	</resultMap>
+
+	<select id="selectUsers" resultType="user">
+		select id,username,password,sex,display_name,registered_time from users where id = #{id}
+	</select>
+	<select id="selectRespond" resultType="respond">
+		select id,context,admin_id,published_time from respond where message_id = #{id}
+	</select>
+	
+	<select id="findPageMessage" resultMap="messagesResult">
+		select id, context,user_id,published_time
+		from messages
+	</select>
+	<select id="findMessageById" parameterType="int" resultMap="messagesResult">
+		select id, context,user_id,published_time
+		from messages
+		where id = #{id}
+	</select>
+	<insert id="add" parameterType="messages">
+		insert into messages(context,user_id,published_time)
+		values (#{context},#{user.id},#{publishedTime})
+	</insert>
+	<update id="modify" parameterType="messages">
+		update messages set
+			context = #{context},
+			published_time = #{publishedTime}
+		where id = #{id}
+	</update>
+	<delete id="delete" parameterType="int">
+		delete from messages where id = #{id}
+	</delete>
+</mapper>
